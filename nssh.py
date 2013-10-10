@@ -17,7 +17,7 @@ __maintainer__ = "Ren Jiaying"
 __email__ = "renjiaying@intra.nsfocus.com"
 __status__ = "Stable"
 
-g_config = {}
+g_config = dict()
 
 
 def is_a_known_host_p(host_ip):
@@ -62,7 +62,7 @@ def get_config_item(config_item):
     """
     Get CONFIG_ITEM from G_CONFIG.
     """
-    if g_config.has_key(config_item):
+    if config_item in g_config:
         return g_config[config_item]
     else:
         sys.exit("You need to config %s in your nssh.yaml file." % config_item)
@@ -255,6 +255,7 @@ def login(account, host_ip, host_port):
                 child_process.interact()
     except pexpect.TIMEOUT:
         sys.exit("timeout.")
+
 
 def main():
     """
