@@ -31,7 +31,10 @@ def is_a_known_host_p(host_ip):
             known_host_flag = True
         else:
             known_host_flag = False
-    return known_host_flag
+    if known_host_flag:
+        return True
+    else:
+        return False
 
 
 def get_known_host_passwd(host_ip):
@@ -108,7 +111,7 @@ def get_onepass(user_name, user_passwd, serial_num, status_code, reason):
         sys.exit("auth errors.")
 
 
-def get_info_form_ssh(pexpect_child, info_type):
+def get_info_form_ssh(pexpect_child):
     """
     Get serial_num or status_code form the PEXPECT_CHILD,
     INFO_TYPE should be 'Serial' or 'Status'.
@@ -118,12 +121,10 @@ def get_info_form_ssh(pexpect_child, info_type):
     info_chunk = raw_info[-1]
     serial_pair, status_pair = info_chunk.split()
 
-    if info_type == 'Serial':
-        serial_num = serial_pair.split(":")[1]
-        return serial_num
-    elif info_type == 'Status':
-        status_code = status_pair.split(":")[1]
-        return status_code
+    serial_num = serial_pair.split(":")[1]
+    status_code = status_pair.split(":")[1]
+
+    return serial_num, status_code
 
 
 def onepass_needed_p(info_chunk):
@@ -199,8 +200,7 @@ def login(account, host_ip, host_port):
             if after_trust_status == passwd_needed:
                 if onepass_needed_p(child_process.before):
                     # 1.2.1 需要一次一密的设备,需要生成密码
-                    serial_num = get_info_form_ssh(child_process, "Serial")
-                    status_code = get_info_form_ssh(child_process, "Status")
+                    serial_num, status_code = get_info_form_ssh(child_process)
 
                     onepass = get_onepass(get_config_item('name'),
                                           get_config_item('passwd'),
@@ -230,8 +230,7 @@ def login(account, host_ip, host_port):
 
         if expect_status == passwd_needed and onepass_needed_p(child_process.before):
             # 2.2.1 需要一次一密的设备,需要生成密码
-            serial_num = get_info_form_ssh(child_process, "Serial")
-            status_code = get_info_form_ssh(child_process, "Status")
+            serial_num, status_code = get_info_form_ssh(child_process)
 
             onepass = get_onepass(get_config_item('name'),
                                   get_config_item('passwd'),
