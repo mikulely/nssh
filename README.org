@@ -1,0 +1,87 @@
+#+TITLE: README for nssh
+
+* Intro
+
+一个 Python 写的 ssh wrapper,可以免输密码登陆 ESD 设备后台.
+
+* Features
+
++ 免输密码登陆一次一密设备后台
++ 在登陆设备后,显示关于设备的必要信息
+
+* Platform
+
+Linux only currently. Cygwin 下未测试.
+
+* Setup
+** The manual way
+*** python2.7
+
+因为 pexpect 不支持 python3,所以请安装 python2. Archlinux 用户执行:
+
+#+BEGIN_SRC sh
+sudo yaourt -S python2
+#+END_SRC
+
+*** pexpecy, pyaml 以及 requests
+
+请使用 pip2 安装,如果时 Archlinux 用户请在安装 =python2-pip= 后:
+
+#+BEGIN_SRC sh
+sudo pip2 install pexpect
+sudo pip2 install pyaml
+sudo pip2 install requests
+#+END_SRC
+
+*** 填写配置文件
+
+#+BEGIN_SRC sh
+cp /path/to/nssh.yaml ~/.nssh.yaml
+chmod 600 ~/.nssh.yaml
+#+END_SRC
+
+编辑 =~/.nssh.yaml= 填上你的 =name= 和 =passwd= 等信息.
+
+*** 把 nssh.py 放在你的 PATH 中
+
+#+BEGIN_SRC sh
+sudo cp nssh.py /usr/local/bin/nssh
+sudo chmod +x /usr/local/bin/nssh
+#+END_SRC
+
+重新打开一次终端,就可以使用 =nssh= 了.
+
+* Usage
+** 登陆一次一密设备
+
+要登陆设备的话,只需要指定设备的 IP 即可.
+
+#+BEGIN_SRC sh
+nssh ip
+#+END_SRC
+
+** 登陆开发机
+
+登陆开发机需要指定名字以及开发机 IP,默认会使用 22 号端口:
+
+#+BEGIN_SRC sh
+nssh user_name@ip
+#+END_SRC
+
+不过还是建议把开发机的密码写在配置文件里.
+
+* Todo List
+
+** TODO 支持登陆历史
+
+现阶段使用 shell 的 =C-r= 快捷键也凑合.
+
+** DONE 将敏感信息放在文件,数据代码分离
+** DONE 支持知道密码的设备免输入登陆
+** DONE 在登陆设备后执行必要的操作
+
+* ISSUE
+
+如果使用中遇到了问题或者有 patch,请发邮件给我.
+
+10/10/13 7:21 PM
