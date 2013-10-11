@@ -158,7 +158,7 @@ def nssh_login(account, host_ip, host_port):
                                           #+ size of the user's term
     cmd_prompt = "[>#\$]"
 
-    firstime_login_server = "Are you sure you want to continue connecting (yes/no)?"
+    firstime_login_server = "Are you sure you want to continue connecting (yes/no)?"  # noqa
     passwd_needed_server = "Password:"
     permission_needed_server = "Permission denied"
     nopass_server = "[>#\$]"
@@ -194,7 +194,7 @@ def nssh_login(account, host_ip, host_port):
             if after_trust_status == need_passwd:
                 if need_onepass_p(child_process.before):
                     # 1.2.1 需要一次一密的设备,需要生成密码
-                    serial_num, status_code = get_serial_num_and_status_code(child_process)
+                    serial_num, status_code = get_serial_num_and_status_code(child_process)  # noqa
 
                     onepass = get_onepass(get_nssh_config_item('name'),
                                           get_nssh_config_item('passwd'),
@@ -204,7 +204,7 @@ def nssh_login(account, host_ip, host_port):
 
                     child_process.sendline(onepass)
                     child_process.expect([cmd_prompt])
-                    child_process.sendline(get_nssh_config_item('after_login_cmd'))
+                    child_process.sendline(get_nssh_config_item('after_login_cmd'))  # noqa
                     child_process.interact()
                 else:
                     if is_a_known_host_p(host_ip):
@@ -222,9 +222,9 @@ def nssh_login(account, host_ip, host_port):
             child_process.sendline()
             child_process.interact()
 
-        if expect_status == need_passwd and need_onepass_p(child_process.before):
+        if expect_status == need_passwd and need_onepass_p(child_process.before):  # noqa
             # 2.2.1 需要一次一密的设备,需要生成密码
-            serial_num, status_code = get_serial_num_and_status_code(child_process)
+            serial_num, status_code = get_serial_num_and_status_code(child_process)  # noqa
 
             onepass = get_onepass(get_nssh_config_item('name'),
                                   get_nssh_config_item('passwd'),
@@ -258,7 +258,7 @@ def main():
     """
     # 1. parse CLI arguments.
     cli_parser = OptionParser(
-        description="Description: ssh wrappered with expect, auto-login without sshkey.",
+        description="Description: ssh wrappered with expect, auto-login without sshkey.",  # noqa
         version='0.1',
         usage="nssh [options] [user@]host_ip",
         epilog="patches are welcomed. <renjiaying@intra.nsfocus.com>"
@@ -266,9 +266,9 @@ def main():
 
     cli_parser.add_option("-f", "--file",
                           dest="filename",
-                          help="read account settings from file, default one is ~/.nssh.yaml",
+                          help="read account settings from file, default one is ~/.nssh.yaml",  # noqa
                           metavar="FILE",
-                          default=os.path.join(os.path.expanduser("~"), '.nssh.yaml'))
+                          default=os.path.join(os.path.expanduser("~"), '.nssh.yaml'))  # noqa
 
     cli_parser.add_option("-p", "--port", dest="port",
                           help="specify the ssh port, default one is 22.",
