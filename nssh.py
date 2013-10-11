@@ -158,24 +158,24 @@ def login(account, host_ip, host_port):
     child_process.setwinsize(rows, cols)  # set the child to the
                                           #+ size of the user's term
 
-    first_launched_server = "Are you sure you want to continue connecting (yes/no)?"
+    firstime_login_server = "Are you sure you want to continue connecting (yes/no)?"
     passwd_needed_server = "Password:"
     permission_needed_server = "Permission denied"
     cmd_prompt = nopass_server = "[>#\$]"
 
     first_launched = 0
-    passwd_needed = 1
-    nopass_needed = 2
-    permission_needed = 3
+    need_passwd = 1
+    not_need_passwd = 2
+    need_permission = 3
 
     try:
         expect_status = child_process.expect([
-            first_launched_server,
+            firstime_login_server,
             passwd_needed_server,
             nopass_server,
             permission_needed_server
         ])
-        if expect_status == permission_needed:
+        if expect_status == need_permission:
             sys.exit("Permission denied on %s. Can't login" % host_ip)
 
         # 1. 对于首次登陆的设备,需要先保存公钥
@@ -186,12 +186,12 @@ def login(account, host_ip, host_port):
                 passwd_needed_server,
                 nopass_server
             ])
-            if after_trust_status == nopass_needed:
+            if after_trust_status == not_need_passwd:
                 # 1.1 没设密码的设备,直接登陆即可
                 child_process.sendline()
                 child_process.interact()
                 # 1.2 需要密码登陆的设备
-            if after_trust_status == passwd_needed:
+            if after_trust_status == need_passwd:
                 if onepass_needed_p(child_process.before):
                     # 1.2.1 需要一次一密的设备,需要生成密码
                     serial_num, status_code = get_info_from_ssh(child_process)
@@ -217,12 +217,12 @@ def login(account, host_ip, host_port):
                         child_process.sendline()
                         child_process.interact()
         # 2. 对于之前登陆过的设备,不需要处理公钥
-        if expect_status == nopass_needed:
+        if expect_status == not_need_passwd:
             # 2.1 没设密码的设备,直接登陆即可
             child_process.sendline()
             child_process.interact()
 
-        if expect_status == passwd_needed and onepass_needed_p(child_process.before):
+        if expect_status == need_passwd and onepass_needed_p(child_process.before):
             # 2.2.1 需要一次一密的设备,需要生成密码
             serial_num, status_code = get_info_from_ssh(child_process)
 
