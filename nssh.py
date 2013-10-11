@@ -268,7 +268,7 @@ def main():
                           dest="filename",
                           help="read account settings from file, default one is ~/.nssh.yaml",
                           metavar="FILE",
-                          default=os.path.join(os.path.expanduser("~"), '.nssh.yaml'))
+                          default=os.path.expanduser("~/.nssh.yaml"))
 
     cli_parser.add_option("-p", "--port", dest="port",
                           help="specify the ssh port, default one is 22.",
