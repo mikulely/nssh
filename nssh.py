@@ -1,7 +1,37 @@
 #!/usr/bin/env python2.7
 #! -*- coding:utf-8 -*-
+# nssh.py - ssh wrappered with expect, auto-login without sshkey.
+# Copyright (C) 2013 Ren jiaying <mikulely@gmail.com>
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation files
+# (the "Software"), to deal in the Software without restriction,
+# including without limitation the rights to use, copy, modify, merge,
+# publish, distribute, sublicense, and/or sell copies of the Software,
+# and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+# BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+# ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
-""" ssh wrappered with expect, auto-login without sshkey. """
+r"""
+ssh wrappered with expect, auto-login without sshkey.
+
+For usage and a list of options, try this:
+
+$ python2.7 nssh.py -h
+
+"""
+__version__ = '0.1'
 
 import sys
 import os
@@ -10,12 +40,6 @@ from optparse import OptionParser
 import pexpect
 import requests
 import yaml
-
-__author__ = "Ren Jiaying"
-__email__ = "renjiaying@intra.nsfocus.com"
-__maintainer__ = "Ren Jiaying"
-__email__ = "renjiaying@intra.nsfocus.com"
-__status__ = "Stable"
 
 g_nssh_config = dict()
 
@@ -114,7 +138,7 @@ def get_onepass(user_name, user_passwd, serial_num, status_code, reason):
 
         for tag in responed_html.split('</b>'):
             if "<b>" in tag:
-                capitaled_onepass = tag[tag.find("<b>")+len("<b>"):]
+                capitaled_onepass = tag[tag.find("<b>") + len("<b>"):]
                 # Caution! 密码认证时是区分大小写的.调试了很久有木有.T_T
                 return capitaled_onepass.lower()
     else:
