@@ -17,7 +17,7 @@ __maintainer__ = "Ren Jiaying"
 __email__ = "renjiaying@intra.nsfocus.com"
 __status__ = "Stable"
 
-g_config = dict()
+g_nssh_config = dict()
 
 
 def is_a_known_host_p(host_ip):
@@ -25,7 +25,7 @@ def is_a_known_host_p(host_ip):
     Check whether HOST_IP's password is already stored in config file.
     """
     known_host_flag = False
-    host_list = get_config_item('host_list')
+    host_list = get_nssh_config_item('host_list')
     for host in host_list:
         if host_ip == host['ip']:
             known_host_flag = True
@@ -41,32 +41,32 @@ def get_known_host_passwd(host_ip):
     """
     Return HOST_IP's password from nssh config file.
     """
-    host_list = get_config_item('host_list')
+    host_list = get_nssh_config_item('host_list')
     for host in host_list:
         if host_ip == host['ip']:
             return host['passwd']
 
 
-def load_config(config_file):
+def load_nssh_config(config_file):
     """
-    Load CONFIG_FILE to global var G_CONFIG, default file is ~/.nssh.yaml.
+    Load CONFIG_FILE to global var G_NSSH_CONFIG, default file is ~/.nssh.yaml.
     """
-    global g_config
+    global g_nssh_config
 
     if os.path.isfile(config_file):
         yaml_file = open(config_file, 'r')
-        g_config = yaml.safe_load(yaml_file)
+        g_nssh_config = yaml.safe_load(yaml_file)
         yaml_file.close()
     else:
         sys.exit('%s dose not exist.\n Create it yourself.' % config_file)
 
 
-def get_config_item(config_item):
+def get_nssh_config_item(config_item):
     """
-    Get CONFIG_ITEM from global var G_CONFIG.
+    Get CONFIG_ITEM from global var G_NSSH_CONFIG.
     """
-    if config_item in g_config:
-        return g_config[config_item]
+    if config_item in g_nssh_config:
+        return g_nssh_config[config_item]
     else:
         sys.exit("You need to config %s in your nssh.yaml file." % config_item)
 
@@ -192,19 +192,19 @@ def login(account, host_ip, host_port):
                 child_process.interact()
                 # 1.2 需要密码登陆的设备
             if after_trust_status == need_passwd:
-                if onepass_needed_p(child_process.before):
+                if need_onepass_p(child_process.before):
                     # 1.2.1 需要一次一密的设备,需要生成密码
-                    serial_num, status_code = get_info_from_ssh(child_process)
+                    serial_num, status_code = get_serial_num_and_status_code(child_process)
 
-                    onepass = get_onepass(get_config_item('name'),
-                                          get_config_item('passwd'),
+                    onepass = get_onepass(get_nssh_config_item('name'),
+                                          get_nssh_config_item('passwd'),
                                           serial_num,
                                           status_code,
-                                          get_config_item('reason'))
+                                          get_nssh_config_item('reason'))
 
                     child_process.sendline(onepass)
                     child_process.expect([cmd_prompt])
-                    child_process.sendline(get_config_item('after_login_cmd'))
+                    child_process.sendline(get_nssh_config_item('after_login_cmd'))
                     child_process.interact()
                 else:
                     if is_a_known_host_p(host_ip):
@@ -222,19 +222,19 @@ def login(account, host_ip, host_port):
             child_process.sendline()
             child_process.interact()
 
-        if expect_status == need_passwd and onepass_needed_p(child_process.before):
+        if expect_status == need_passwd and need_onepass_p(child_process.before):
             # 2.2.1 需要一次一密的设备,需要生成密码
-            serial_num, status_code = get_info_from_ssh(child_process)
+            serial_num, status_code = get_serial_num_and_status_code(child_process)
 
-            onepass = get_onepass(get_config_item('name'),
-                                  get_config_item('passwd'),
+            onepass = get_onepass(get_nssh_config_item('name'),
+                                  get_nssh_config_item('passwd'),
                                   serial_num,
                                   status_code,
-                                  get_config_item('reason'))
+                                  get_nssh_config_item('reason'))
             child_process.sendline(onepass)
             # 在登陆后执行必要的操作,显示设备类型
             child_process.expect([cmd_prompt])
-            child_process.sendline(get_config_item('after_login_cmd'))
+            child_process.sendline(get_nssh_config_item('after_login_cmd'))
             child_process.interact()
         else:
             if is_a_known_host_p(host_ip):
@@ -275,20 +275,26 @@ def main():
                           )
 
     (opts, args) = cli_parser.parse_args()
-    load_config(opts.filename)
 
-    if args_are_validate_p(cli_parser, args):
+    if are_validate_args_p(args):
+        # 2. load config file.
+        load_nssh_config(opts.filename)
+
+        # 3. fire ssh login.
         host_str = args[0]
         if host_str.find("@") != -1:
             (account, host_ip) = host_str.split("@")
             host_port = int(opts.port)
         else:
             host_ip = args[0]
-            account = get_config_item('default_login_account')
-            if int(opts.port) == get_config_item('default_ssh_port'):
-                host_port = get_config_item('device_ssh_port')
+            account = get_nssh_config_item('default_login_account')
+            if int(opts.port) == get_nssh_config_item('default_ssh_port'):
+                host_port = get_nssh_config_item('device_ssh_port')
 
-        login(account, host_ip, host_port)
+        ssh_login(account, host_ip, host_port)
+    else:
+        cli_parser.print_usage()
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()
