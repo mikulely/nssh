@@ -71,7 +71,7 @@ def get_config_item(config_item):
         sys.exit("You need to config %s in your nssh.yaml file." % config_item)
 
 
-def gettermsize():
+def get_termsize():
     '''
     Horrible non-portable hack to get the terminal size to transmit
     to the child process spawned by pexpect.
@@ -160,7 +160,7 @@ def login(account, host_ip, host_port):
     cd_to_nsfocus_dir = "cd /opt/nsfocus/; echo current dir is `pwd`"
     after_login_cmd = echo_device_type + cd_to_nsfocus_dir
 
-    (rows, cols) = gettermsize()
+    (rows, cols) = get_termsize()
     child_process.setwinsize(rows, cols)  # set the child to the
                                           #+ size of the user's term
 
@@ -259,12 +259,13 @@ def login(account, host_ip, host_port):
 def main():
     """
     1. parse CLI arguments.
-    2. ssh login
+    2. load config file.
+    3. fire ssh login.
     """
     cli_parser = OptionParser(
         description="Description: ssh wrapper with auto-login enabled.",
         version='0.1',
-        usage="nssh [options] [user@]device_ip",
+        usage="nssh [options] [user@]host_ip",
         epilog="patches are welcomed. <renjiaying@intra.nsfocus.com>"
     )
 
