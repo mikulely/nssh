@@ -146,7 +146,7 @@ def are_validate_args_p(args):
         return True
 
 
-def ssh_login(account, host_ip, host_port):
+def nssh_login(account, host_ip, host_port):
     """
     Use ssh to login HOST_IP PORT with ACCOUNT.
     """
@@ -292,7 +292,7 @@ def main():
             if int(opts.port) == get_nssh_config_item('default_ssh_port'):
                 host_port = get_nssh_config_item('device_ssh_port')
 
-        ssh_login(account, host_ip, host_port)
+        nssh_login(account, host_ip, host_port)
     else:
         cli_parser.print_usage()
         sys.exit(1)
