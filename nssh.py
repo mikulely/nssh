@@ -39,7 +39,7 @@ def is_a_known_host_p(host_ip):
 
 def get_known_host_passwd(host_ip):
     """
-    Return HOST_IP's password form nssh config file.
+    Return HOST_IP's password from nssh config file.
     """
     host_list = get_config_item('host_list')
     for host in host_list:
@@ -111,9 +111,9 @@ def get_onepass(user_name, user_passwd, serial_num, status_code, reason):
         sys.exit("auth errors.")
 
 
-def get_info_form_ssh(ssh_process):
+def get_info_from_ssh(ssh_process):
     """
-    Get serial_num or status_code form the SSH_PROCESS,
+    Get serial_num or status_code from the SSH_PROCESS,
     INFO_TYPE should be 'Serial' or 'Status'.
     """
     # Caution! before 属性中的字串可能一行也可能多行
@@ -200,7 +200,7 @@ def login(account, host_ip, host_port):
             if after_trust_status == passwd_needed:
                 if onepass_needed_p(child_process.before):
                     # 1.2.1 需要一次一密的设备,需要生成密码
-                    serial_num, status_code = get_info_form_ssh(child_process)
+                    serial_num, status_code = get_info_from_ssh(child_process)
 
                     onepass = get_onepass(get_config_item('name'),
                                           get_config_item('passwd'),
@@ -230,7 +230,7 @@ def login(account, host_ip, host_port):
 
         if expect_status == passwd_needed and onepass_needed_p(child_process.before):
             # 2.2.1 需要一次一密的设备,需要生成密码
-            serial_num, status_code = get_info_form_ssh(child_process)
+            serial_num, status_code = get_info_from_ssh(child_process)
 
             onepass = get_onepass(get_config_item('name'),
                                   get_config_item('passwd'),
