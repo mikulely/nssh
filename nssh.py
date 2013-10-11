@@ -22,7 +22,7 @@ g_config = dict()
 
 def is_a_known_host_p(host_ip):
     """
-    Check whether password is already stored in nssh config file.
+    Check whether HOST_IP's password is already stored in config file.
     """
     known_host_flag = False
     host_list = get_config_item('host_list')
@@ -49,7 +49,7 @@ def get_known_host_passwd(host_ip):
 
 def load_config(config_file):
     """
-    Load CONFIG_FILE to G_CONFIG, default config file is ~/.nssh.yaml.
+    Load CONFIG_FILE to global var G_CONFIG, default file is ~/.nssh.yaml.
     """
     global g_config
 
@@ -63,7 +63,7 @@ def load_config(config_file):
 
 def get_config_item(config_item):
     """
-    Get CONFIG_ITEM from G_CONFIG.
+    Get CONFIG_ITEM from global var G_CONFIG.
     """
     if config_item in g_config:
         return g_config[config_item]
@@ -86,7 +86,7 @@ def get_termsize():
 
 def get_onepass(user_name, user_passwd, serial_num, status_code, reason):
     """
-    Get onetime passwd from nsfocus auth server.
+    Get onetime passwd from auth server.
     """
     passwd_server_url = get_config_item('auth_url')
 
@@ -104,17 +104,16 @@ def get_onepass(user_name, user_passwd, serial_num, status_code, reason):
 
         for tag in responed_html.split('</b>'):
             if "<b>" in tag:
-                capital_onepass = tag[tag.find("<b>")+len("<b>"):]
+                capitaled_onepass = tag[tag.find("<b>")+len("<b>"):]
                 # Caution! 密码认证时是区分大小写的.调试了很久有木有.T_T
-                return capital_onepass.lower()
+                return capitaled_onepass.lower()
     else:
         sys.exit("auth errors.")
 
 
 def get_info_from_ssh(ssh_process):
     """
-    Get serial_num or status_code from the SSH_PROCESS,
-    INFO_TYPE should be 'Serial' or 'Status'.
+    Get serial_num and status_code from the SSH_PROCESS.
     """
     # Caution! before 属性中的字串可能一行也可能多行
     raw_info = ssh_process.before.strip().split('\r\n')
@@ -129,7 +128,7 @@ def get_info_from_ssh(ssh_process):
 
 def onepass_needed_p(info_chunk):
     """
-    Find 'Serial' in INFO_CHUNK to decided whether onepass is needed.
+    Find 'Serial' in INFO_CHUNK to check whether onepass is needed.
     """
     if 'Serial' in info_chunk:
         return True
