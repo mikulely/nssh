@@ -1,7 +1,7 @@
 #!/usr/bin/env python2.7
 #! -*- coding:utf-8 -*-
 
-''' ssh wrapper with expect, auto-login without sshkey '''
+''' ssh wrappered with expect, auto-login without sshkey '''
 
 import sys
 import os
@@ -256,8 +256,9 @@ def main():
     2. load config file.
     3. fire ssh login.
     """
+    # 1. parse CLI arguments.
     cli_parser = OptionParser(
-        description="Description: ssh wrapper with auto-login enabled.",
+        description="Description: ssh wrappered with expect, auto-login without sshkey.",
         version='0.1',
         usage="nssh [options] [user@]host_ip",
         epilog="patches are welcomed. <renjiaying@intra.nsfocus.com>"
