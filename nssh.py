@@ -84,13 +84,23 @@ def get_termsize():
     return (rows, cols)
 
 
+def need_onepass_p(info_chunk):
+    """
+    Find 'Serial' in INFO_CHUNK to check whether onepass is needed.
+    """
+    if 'Serial' in info_chunk:
+        return True
+    else:
+        return False
+
+
 def get_onepass(user_name, user_passwd, serial_num, status_code, reason):
     """
-    Get onetime passwd from auth server.
+    Get onetime password from auth server.
     """
-    passwd_server_url = get_config_item('auth_url')
+    auth_server_url = get_nssh_config_item('auth_url')
 
-    form_info = {
+    auth_form_info = {
         'username': user_name,
         'passwd': user_passwd,
         'hardcode': serial_num,
@@ -98,7 +108,7 @@ def get_onepass(user_name, user_passwd, serial_num, status_code, reason):
         'reason': reason
     }
 
-    responed = requests.post(passwd_server_url, data=form_info)
+    responed = requests.post(auth_server_url, data=auth_form_info)
     if responed.status_code == requests.codes.ok:
         responed_html = responed.content
 
@@ -111,7 +121,7 @@ def get_onepass(user_name, user_passwd, serial_num, status_code, reason):
         sys.exit("auth errors.")
 
 
-def get_info_from_ssh(ssh_process):
+def get_serial_num_and_status_code(ssh_process):
     """
     Get serial_num and status_code from the SSH_PROCESS.
     """
@@ -126,30 +136,19 @@ def get_info_from_ssh(ssh_process):
     return serial_num, status_code
 
 
-def onepass_needed_p(info_chunk):
+def are_validate_args_p(args):
     """
-    Find 'Serial' in INFO_CHUNK to check whether onepass is needed.
-    """
-    if 'Serial' in info_chunk:
-        return True
-    else:
-        return False
-
-
-def args_are_validate_p(parser, args):
-    """
-    Check ARGS validation with PARSER.
+    Check ARGS validation.
     """
     if len(args) != 1:
-        parser.print_usage()
-        sys.exit(1)
+        return False
     else:
         return True
 
 
-def login(account, host_ip, host_port):
+def ssh_login(account, host_ip, host_port):
     """
-    SSH Login HOST_IP PORT with ACCOUNT.
+    Use ssh to login HOST_IP PORT with ACCOUNT.
     """
     login_cmd = "ssh -p%d %s@%s " % (host_port, account, host_ip)
     child_process = pexpect.spawn(login_cmd)
@@ -157,13 +156,14 @@ def login(account, host_ip, host_port):
     (rows, cols) = get_termsize()
     child_process.setwinsize(rows, cols)  # set the child to the
                                           #+ size of the user's term
+    cmd_prompt = "[>#\$]"
 
     firstime_login_server = "Are you sure you want to continue connecting (yes/no)?"
     passwd_needed_server = "Password:"
     permission_needed_server = "Permission denied"
-    cmd_prompt = nopass_server = "[>#\$]"
+    nopass_server = "[>#\$]"
 
-    first_launched = 0
+    firstime_login = 0
     need_passwd = 1
     not_need_passwd = 2
     need_permission = 3
@@ -179,7 +179,7 @@ def login(account, host_ip, host_port):
             sys.exit("Permission denied on %s. Can't login" % host_ip)
 
         # 1. 对于首次登陆的设备,需要先保存公钥
-        if expect_status == first_launched:
+        if expect_status == firstime_login:
             child_process.sendline('yes')
             after_trust_status = child_process.expect([
                 pexpect.EOF,
