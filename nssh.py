@@ -92,7 +92,7 @@ def get_nssh_config_item(config_item):
     if config_item in g_nssh_config:
         return g_nssh_config[config_item]
     else:
-        sys.exit("You need to config %s in your nssh.yaml file." % config_item)
+        sys.exit("You need to config %s in your nssh config file." % config_item)
 
 
 def get_termsize():
@@ -274,13 +274,10 @@ def nssh_login(account, host_ip, host_port):
         sys.exit("timeout.")
 
 
-def main():
+def get_nssh_cli_parser(prog='nssh', version=__version__):
     """
-    1. parse CLI arguments.
-    2. load config file.
-    3. fire ssh login.
+    Return nssh cli parser.
     """
-    # 1. parse CLI arguments.
     cli_parser = OptionParser(
         description="Description: ssh wrappered with expect, auto-login without sshkey.",
         version='0.1',
@@ -298,6 +295,17 @@ def main():
                           help="specify the ssh port, default one is 22.",
                           default=22
                           )
+    return cli_parser
+
+
+def main():
+    """
+    1. Parse CLI arguments.
+    2. Load config file.
+    3. Fire ssh login.
+    """
+    # 1. parse CLI arguments.
+    cli_parser = get_nssh_cli_parser()
 
     (opts, args) = cli_parser.parse_args()
 
