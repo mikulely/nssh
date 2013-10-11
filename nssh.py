@@ -154,11 +154,6 @@ def login(account, host_ip, host_port):
     login_cmd = "ssh -p%d %s@%s " % (host_port, account, host_ip)
     child_process = pexpect.spawn(login_cmd)
 
-    # TODO 把 after_long_cmd 搞成可配置的.
-    echo_device_type = "echo device is `cat /opt/nsfocus/etc/product`;"
-    cd_to_nsfocus_dir = "cd /opt/nsfocus/; echo current dir is `pwd`"
-    after_login_cmd = echo_device_type + cd_to_nsfocus_dir
-
     (rows, cols) = get_termsize()
     child_process.setwinsize(rows, cols)  # set the child to the
                                           #+ size of the user's term
@@ -209,7 +204,7 @@ def login(account, host_ip, host_port):
 
                     child_process.sendline(onepass)
                     child_process.expect([cmd_prompt])
-                    child_process.sendline(after_login_cmd)
+                    child_process.sendline(get_config_item('after_login_cmd'))
                     child_process.interact()
                 else:
                     if is_a_known_host_p(host_ip):
@@ -239,7 +234,7 @@ def login(account, host_ip, host_port):
             child_process.sendline(onepass)
             # 在登陆后执行必要的操作,显示设备类型
             child_process.expect([cmd_prompt])
-            child_process.sendline(after_login_cmd)
+            child_process.sendline(get_config_item('after_login_cmd'))
             child_process.interact()
         else:
             if is_a_known_host_p(host_ip):
