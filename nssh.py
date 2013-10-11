@@ -1,7 +1,7 @@
 #!/usr/bin/env python2.7
 #! -*- coding:utf-8 -*-
 
-''' ssh wrappered with expect, auto-login without sshkey '''
+""" ssh wrappered with expect, auto-login without sshkey. """
 
 import sys
 import os
