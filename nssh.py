@@ -111,13 +111,13 @@ def get_onepass(user_name, user_passwd, serial_num, status_code, reason):
         sys.exit("auth errors.")
 
 
-def get_info_form_ssh(pexpect_child):
+def get_info_form_ssh(ssh_process):
     """
-    Get serial_num or status_code form the PEXPECT_CHILD,
+    Get serial_num or status_code form the SSH_PROCESS,
     INFO_TYPE should be 'Serial' or 'Status'.
     """
     # Caution! before 属性中的字串可能一行也可能多行
-    raw_info = pexpect_child.before.strip().split('\r\n')
+    raw_info = ssh_process.before.strip().split('\r\n')
     info_chunk = raw_info[-1]
     serial_pair, status_pair = info_chunk.split()
 
