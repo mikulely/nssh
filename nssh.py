@@ -278,21 +278,25 @@ def get_nssh_cli_parser(prog='nssh', version=__version__):
     """
     Return nssh cli parser.
     """
-    cli_parser = OptionParser(
-        description="Description: ssh wrappered with expect, auto-login without sshkey.",
-        version='0.1',
-        usage="nssh [options] [user@]host_ip",
-        epilog="patches are welcomed. <renjiaying@intra.nsfocus.com>"
-    )
+    cli_parser = OptionParser(prog=prog,
+                              version=version,
+                              usage="nssh [options] [user@]host_ip",
+                              description="Description: ssh wrappered with expect,"
+                              " auto-login without sshkey.",
+                              epilog="patches are welcomed. <renjiaying@intra.nsfocus.com>")
 
     cli_parser.add_option("-f", "--file",
                           dest="filename",
-                          help="read account settings from file, default one is ~/.nssh.yaml",
+                          help="read account settings from file,"
+                          " default one is ~/.nssh.yaml",
                           metavar="FILE",
                           default=os.path.expanduser("~/.nssh.yaml"))
 
-    cli_parser.add_option("-p", "--port", dest="port",
+    cli_parser.add_option("-p", "--port",
+                          dest="port",
+                          type="int",
                           help="specify the ssh port, default one is 22.",
+                          metavar="n",
                           default=22
                           )
     return cli_parser
@@ -317,11 +321,11 @@ def main():
         host_str = args[0]
         if host_str.find("@") != -1:
             (account, host_ip) = host_str.split("@")
-            host_port = int(opts.port)
+            host_port = opts.port
         else:
             host_ip = args[0]
             account = get_nssh_config_item('default_login_account')
-            if int(opts.port) == get_nssh_config_item('default_ssh_port'):
+            if opts.port == get_nssh_config_item('default_ssh_port'):
                 host_port = get_nssh_config_item('device_ssh_port')
 
         nssh_login(account, host_ip, host_port)
