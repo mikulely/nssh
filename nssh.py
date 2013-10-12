@@ -82,7 +82,7 @@ def load_nssh_config(config_file):
         g_nssh_config = yaml.safe_load(yaml_file)
         yaml_file.close()
     else:
-        sys.exit('%s dose not exist.\n Create it yourself.' % config_file)
+        sys.exit('%s does not exist.\n Create it yourself.' % config_file)
 
 
 def get_nssh_config_item(config_item):
