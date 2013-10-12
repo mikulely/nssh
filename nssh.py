@@ -23,7 +23,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-r"""
+"""
 ssh wrappered with expect, auto-login without sshkey.
 
 For usage and a list of options, try this:
@@ -96,11 +96,13 @@ def get_nssh_config_item(config_item):
 
 
 def get_termsize():
-    '''
+    """
+    Get terminal size from the cmd `stty size`.
+
     Horrible non-portable hack to get the terminal size to transmit
     to the child process spawned by pexpect.
     @see https://github.com/bdelliott/sshpass/blob/master/sshpass.py
-    '''
+    """
     (rows, cols) = os.popen("stty size").read().split()  # works on Mac OS X
                                                          #+ and ArchLinux. YMMV
     rows = int(rows)
@@ -110,7 +112,7 @@ def get_termsize():
 
 def need_onepass_p(info_chunk):
     """
-    Find 'Serial' in INFO_CHUNK to check whether onepass is needed.
+    Check whether onepass is needed by search 'Serial' in INFO_CHUNK.
     """
     if 'Serial' in info_chunk:
         return True
@@ -276,7 +278,7 @@ def nssh_login(account, host_ip, host_port):
 
 def get_nssh_cli_parser(prog='nssh', version=__version__):
     """
-    Return nssh cli parser.
+    Return nssh cli parser and set nssh cli options.
     """
     cli_parser = OptionParser(prog=prog,
                               version=version,
@@ -304,9 +306,11 @@ def get_nssh_cli_parser(prog='nssh', version=__version__):
 
 def main():
     """
+    nssh takes three steps to fire up, which you can see below.
+
     1. Parse CLI arguments.
     2. Load config file.
-    3. Fire ssh login.
+    3. Fire login up.
     """
     # 1. parse CLI arguments.
     cli_parser = get_nssh_cli_parser()
