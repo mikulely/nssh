@@ -82,7 +82,7 @@ def get_known_host_passwd(host_ip):
 
 def load_nssh_config(config_file):
     """
-    Load CONFIG_FILE to global var G_NSSH_CONFIG, default file is ~/.nssh.yaml.
+    Load CONFIG_FILE to global variable G_NSSH_CONFIG, default file is ~/.nssh.yaml.
     """
     global g_nssh_config
 
@@ -96,7 +96,7 @@ def load_nssh_config(config_file):
 
 def get_nssh_config_item(config_item):
     """
-    Get CONFIG_ITEM from global var G_NSSH_CONFIG.
+    Get CONFIG_ITEM from global variable G_NSSH_CONFIG.
     """
     if config_item in g_nssh_config:
         return g_nssh_config[config_item]
@@ -111,6 +111,7 @@ def get_termsize():
     Horrible non-portable hack to get the terminal size to transmit
     to the child process spawned by pexpect.
     @see https://github.com/bdelliott/sshpass/blob/master/sshpass.py
+
     """
     (rows, cols) = os.popen("stty size").read().split()  # works on Mac OS X
                                                          #+ and ArchLinux. YMMV
@@ -320,6 +321,7 @@ def main():
     1. Parse CLI arguments.
     2. Load config file.
     3. Fire login up.
+
     """
     # 1. parse CLI arguments.
     cli_parser = get_nssh_cli_parser()
