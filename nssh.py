@@ -23,7 +23,8 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""ssh wrappered with expect, auto-login without sshkey.
+"""
+ssh wrappered with expect, auto-login without sshkey.
 
 For usage and a list of options, try this:
 
@@ -37,7 +38,6 @@ If you want to load another config file, you can specify it with -f
 option. Like this:
 
 $ python2.7 nssh.py host_ip -f /path/to/your_nssh.yaml
-
 
 """
 __version__ = '0.1'
