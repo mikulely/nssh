@@ -199,7 +199,7 @@ def nssh_login(account, host_ip, host_port):
 
     (rows, cols) = get_termsize()
     ssh_process.setwinsize(rows, cols)  # set the child to the
-                                          #+ size of the user's term
+                                        #+ size of the user's term
     cmd_prompt = "[>#\$]"
 
     firstime_login_server = "Are you sure you want to continue connecting (yes/no)?"
