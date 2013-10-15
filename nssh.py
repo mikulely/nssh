@@ -42,9 +42,10 @@ $ python2.7 nssh.py host_ip -f /path/to/your_nssh.yaml
 """
 __version__ = '0.1'
 
-import sys
-import os
+
 from optparse import OptionParser
+import os
+import sys
 
 import pexpect
 import requests
