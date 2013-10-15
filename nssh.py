@@ -60,14 +60,16 @@ def is_a_known_host_p(host_ip):
     """
     Check whether HOST_IP's password is already stored in config file.
     """
-    known_host_flag = False
+    is_known_host_f = False
+
     host_list = get_nssh_config_item('host_list')
     for host in host_list:
         if host_ip == host['ip']:
-            known_host_flag = True
+            is_known_host_f = True
         else:
-            known_host_flag = False
-    if known_host_flag:
+            is_known_host_f = False
+
+    if is_known_host_f:
         return True
     else:
         return False
