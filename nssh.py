@@ -85,7 +85,7 @@ def get_known_host_passwd(host_ip):
 
 def load_nssh_config(config_file):
     """
-    Load CONFIG_FILE to global variable G_NSSH_CONFIG, default file is ~/.nssh.yaml.
+    Load CONFIG_FILE to global variable G_NSSH_CONFIG, default is ~/.nssh.yaml.
     """
     global g_nssh_config
 
@@ -104,7 +104,8 @@ def get_nssh_config_item(config_item):
     if config_item in g_nssh_config:
         return g_nssh_config[config_item]
     else:
-        sys.exit("You need to config %s in your nssh config file." % config_item)
+        sys.exit("You need to config %s in your nssh config file."
+                 % config_item)
 
 
 def get_termsize():
@@ -160,7 +161,7 @@ def get_onepass(user_name, user_passwd, serial_num, status_code, reason):
         sys.exit("auth errors.")
 
 
-def get_serial_num_and_status_code(ssh_process):
+def get_serial_and_status(ssh_process):
     """
     Get serial_num and status_code from the SSH_PROCESS.
     """
@@ -233,7 +234,7 @@ def nssh_login(account, host_ip, host_port):
             if after_trust_status == need_passwd:
                 if need_onepass_p(child_process.before):
                     # 1.2.1 需要一次一密的设备,需要生成密码
-                    serial_num, status_code = get_serial_num_and_status_code(child_process)
+                    serial_num, status_code = get_serial_and_status(child_process)
 
                     onepass = get_onepass(get_nssh_config_item('name'),
                                           get_nssh_config_item('passwd'),
@@ -263,7 +264,7 @@ def nssh_login(account, host_ip, host_port):
 
         if expect_status == need_passwd and need_onepass_p(child_process.before):
             # 2.2.1 需要一次一密的设备,需要生成密码
-            serial_num, status_code = get_serial_num_and_status_code(child_process)
+            serial_num, status_code = get_serial_and_status(child_process)
 
             onepass = get_onepass(get_nssh_config_item('name'),
                                   get_nssh_config_item('passwd'),
