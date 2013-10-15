@@ -285,8 +285,8 @@ def nssh_login(account, host_ip, host_port):
                 # 2.2.3 需要普通密码登陆的设备,又没有保存密码的设备,让用户输入
                 child_process.sendline()
                 child_process.interact()
-    except pexpect.TIMEOUT:
-        sys.exit("timeout.")
+    except pexpect.TIMEOUT as timeout_exception:
+        sys.exit("Ops, %s", timeout_exception)
 
 
 def get_nssh_cli_parser(prog='nssh', version=__version__):
