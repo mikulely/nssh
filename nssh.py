@@ -193,10 +193,10 @@ def nssh_login(account, host_ip, host_port):
     Use ssh to login HOST_IP PORT with ACCOUNT.
     """
     login_cmd = "ssh -p%d %s@%s " % (host_port, account, host_ip)
-    child_process = pexpect.spawn(login_cmd)
+    ssh_process = pexpect.spawn(login_cmd)
 
     (rows, cols) = get_termsize()
-    child_process.setwinsize(rows, cols)  # set the child to the
+    ssh_process.setwinsize(rows, cols)  # set the child to the
                                           #+ size of the user's term
     cmd_prompt = "[>#\$]"
 
@@ -211,7 +211,7 @@ def nssh_login(account, host_ip, host_port):
     need_permission = 3
 
     try:
-        expect_status = child_process.expect([
+        expect_status = ssh_process.expect([
             firstime_login_server,
             passwd_needed_server,
             nopass_server,
@@ -222,21 +222,21 @@ def nssh_login(account, host_ip, host_port):
 
         # 1. 对于首次登陆的设备,需要先保存公钥
         if expect_status == firstime_login:
-            child_process.sendline('yes')
-            after_trust_status = child_process.expect([
+            ssh_process.sendline('yes')
+            after_trust_status = ssh_process.expect([
                 pexpect.EOF,
                 passwd_needed_server,
                 nopass_server
             ])
             if after_trust_status == not_need_passwd:
                 # 1.1 没设密码的设备,直接登陆即可
-                child_process.sendline()
-                child_process.interact()
+                ssh_process.sendline()
+                ssh_process.interact()
                 # 1.2 需要密码登陆的设备
             if after_trust_status == need_passwd:
-                if need_onepass_p(child_process.before):
+                if need_onepass_p(ssh_process.before):
                     # 1.2.1 需要一次一密的设备,需要生成密码
-                    serial_num, status_code = get_serial_and_status(child_process)
+                    serial_num, status_code = get_serial_and_status(ssh_process)
 
                     onepass = get_onepass(get_nssh_config_item('name'),
                                           get_nssh_config_item('passwd'),
@@ -244,50 +244,50 @@ def nssh_login(account, host_ip, host_port):
                                           status_code,
                                           get_nssh_config_item('reason'))
 
-                    child_process.sendline(onepass)
-                    child_process.expect([cmd_prompt])
-                    child_process.sendline(get_nssh_config_item('after_login_cmd'))
-                    child_process.interact()
+                    ssh_process.sendline(onepass)
+                    ssh_process.expect([cmd_prompt])
+                    ssh_process.sendline(get_nssh_config_item('after_login_cmd'))
+                    ssh_process.interact()
                 else:
                     if is_a_known_host_p(host_ip):
                         # 1.2.2 需要普通密码登陆的设备,但是已经保存了密码的设备
                         stored_passwd = get_known_host_passwd(host_ip)
-                        child_process.sendline(stored_passwd)
-                        child_process.interact()
+                        ssh_process.sendline(stored_passwd)
+                        ssh_process.interact()
                     else:
                         # 1.2.3 需要普通密码登陆的设备,又没有保存密码的设备,让用户输入
-                        child_process.sendline()
-                        child_process.interact()
+                        ssh_process.sendline()
+                        ssh_process.interact()
         # 2. 对于之前登陆过的设备,不需要处理公钥
         if expect_status == not_need_passwd:
             # 2.1 没设密码的设备,直接登陆即可
-            child_process.sendline()
-            child_process.interact()
+            ssh_process.sendline()
+            ssh_process.interact()
 
-        if expect_status == need_passwd and need_onepass_p(child_process.before):
+        if expect_status == need_passwd and need_onepass_p(ssh_process.before):
             # 2.2.1 需要一次一密的设备,需要生成密码
-            serial_num, status_code = get_serial_and_status(child_process)
+            serial_num, status_code = get_serial_and_status(ssh_process)
 
             onepass = get_onepass(get_nssh_config_item('name'),
                                   get_nssh_config_item('passwd'),
                                   serial_num,
                                   status_code,
                                   get_nssh_config_item('reason'))
-            child_process.sendline(onepass)
+            ssh_process.sendline(onepass)
             # 在登陆后执行必要的操作,显示设备类型
-            child_process.expect([cmd_prompt])
-            child_process.sendline(get_nssh_config_item('after_login_cmd'))
-            child_process.interact()
+            ssh_process.expect([cmd_prompt])
+            ssh_process.sendline(get_nssh_config_item('after_login_cmd'))
+            ssh_process.interact()
         else:
             if is_a_known_host_p(host_ip):
                 # 2.2.2 需要普通密码登陆的设备,但是已经保存了密码的设备
                 stored_passwd = get_known_host_passwd(host_ip)
-                child_process.sendline(stored_passwd)
-                child_process.interact()
+                ssh_process.sendline(stored_passwd)
+                ssh_process.interact()
             else:
                 # 2.2.3 需要普通密码登陆的设备,又没有保存密码的设备,让用户输入
-                child_process.sendline()
-                child_process.interact()
+                ssh_process.sendline()
+                ssh_process.interact()
     except pexpect.TIMEOUT as timeout_exception:
         sys.exit("Ops, %s", timeout_exception)
 
