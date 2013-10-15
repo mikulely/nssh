@@ -297,14 +297,16 @@ def get_nssh_cli_parser(prog='nssh', version=__version__):
     cli_parser = OptionParser(prog=prog,
                               version=version,
                               usage="nssh [options] [user@]host_ip",
-                              description="Description: ssh wrappered with expect,"
-                              " auto-login without sshkey.",
-                              epilog="patches are welcomed. <renjiaying@intra.nsfocus.com>")
+                              description="Description: "
+                              "ssh wrappered with expect, "
+                              "auto-login without sshkey.",
+                              epilog="patches are welcomed. "
+                              "<renjiaying@intra.nsfocus.com>")
 
     cli_parser.add_option("-f", "--file",
                           dest="filename",
-                          help="read account settings from file,"
-                          " default one is ~/.nssh.yaml",
+                          help="read account settings from file, "
+                          "default one is ~/.nssh.yaml.",
                           metavar="FILE",
                           default=os.path.expanduser("~/.nssh.yaml"))
 
