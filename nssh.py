@@ -177,7 +177,7 @@ def get_serial_and_status(ssh_process):
     serial_num = serial_pair.split(":")[1]
     status_code = status_pair.split(":")[1]
 
-    return serial_num, status_code
+    return (serial_num, status_code)
 
 
 def are_validate_args_p(args):
