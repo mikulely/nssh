@@ -202,7 +202,8 @@ def nssh_login(account, host_ip, host_port):
                                         #+ size of the user's term
     cmd_prompt = "[>#\$]"
 
-    firstime_login_server = "Are you sure you want to continue connecting (yes/no)?"
+    firstime_login_server = ("Are you sure you want to "
+                             "continue connecting (yes/no)?")
     passwd_needed_server = "Password:"
     permission_needed_server = "Permission denied"
     nopass_server = "[>#\$]"
