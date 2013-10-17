@@ -56,7 +56,7 @@ import yaml
 g_nssh_config = dict()
 
 
-def is_a_known_host_p(host_ip):
+def is_known_host_p(host_ip):
     """
     Check whether HOST_IP's password is already stored in config file.
     """
@@ -252,7 +252,7 @@ def nssh_login(account, host_ip, host_port):
                     ssh_process.sendline(get_nssh_config_item('after_login_cmd'))
                     ssh_process.interact()
                 else:
-                    if is_a_known_host_p(host_ip):
+                    if is_known_host_p(host_ip):
                         # 1.2.2 需要普通密码登陆的设备,但是已经保存了密码的设备
                         stored_passwd = get_known_host_passwd(host_ip)
                         ssh_process.sendline(stored_passwd)
@@ -282,7 +282,7 @@ def nssh_login(account, host_ip, host_port):
             ssh_process.sendline(get_nssh_config_item('after_login_cmd'))
             ssh_process.interact()
         else:
-            if is_a_known_host_p(host_ip):
+            if is_known_host_p(host_ip):
                 # 2.2.2 需要普通密码登陆的设备,但是已经保存了密码的设备
                 stored_passwd = get_known_host_passwd(host_ip)
                 ssh_process.sendline(stored_passwd)
