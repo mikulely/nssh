@@ -92,11 +92,8 @@ def load_nssh_config(config_file):
     global g_nssh_config
 
     if os.path.isfile(config_file):
-        yaml_file = open(config_file, 'r')
-        try:
+        with open(config_file, 'r') as yaml_file:
             g_nssh_config = yaml.safe_load(yaml_file)
-        finally:
-            yaml_file.close()
     else:
         sys.exit('%s does not exist.\n Create it yourself.' % config_file)
 
