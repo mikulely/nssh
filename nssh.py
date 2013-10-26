@@ -57,9 +57,7 @@ g_nssh_config = dict()
 
 
 def is_known_host_p(host_ip):
-    """
-    Check whether HOST_IP's password is already stored in config file.
-    """
+    """Check whether HOST_IP's password is already stored in config file."""
     is_known_host_f = False
 
     host_list = get_nssh_config_item('host_list')
@@ -76,9 +74,7 @@ def is_known_host_p(host_ip):
 
 
 def get_known_host_passwd(host_ip):
-    """
-    Return HOST_IP's password from nssh config file.
-    """
+    """Return HOST_IP's password from nssh config file."""
     host_list = get_nssh_config_item('host_list')
     for host in host_list:
         if host_ip == host['ip']:
@@ -86,9 +82,7 @@ def get_known_host_passwd(host_ip):
 
 
 def load_nssh_config(config_file):
-    """
-    Load CONFIG_FILE to global variable G_NSSH_CONFIG, default is ~/.nssh.yaml.
-    """
+    """Load CONFIG_FILE to global variable G_NSSH_CONFIG."""
     global g_nssh_config
 
     if os.path.isfile(config_file):
@@ -99,9 +93,7 @@ def load_nssh_config(config_file):
 
 
 def get_nssh_config_item(config_item):
-    """
-    Get CONFIG_ITEM from global variable G_NSSH_CONFIG.
-    """
+    """Get CONFIG_ITEM from global variable G_NSSH_CONFIG."""
     if config_item in g_nssh_config:
         return g_nssh_config[config_item]
     else:
@@ -126,9 +118,7 @@ def get_termsize():
 
 
 def need_onepass_p(info_chunk):
-    """
-    Check whether onepass is needed by search 'Serial' in INFO_CHUNK.
-    """
+    """Check whether onepass is needed by search 'Serial' in INFO_CHUNK."""
     if 'Serial' in info_chunk:
         return True
     else:
@@ -136,9 +126,7 @@ def need_onepass_p(info_chunk):
 
 
 def get_onepass(user_name, user_passwd, serial_num, status_code, reason):
-    """
-    Get onetime password from auth server.
-    """
+    """Get onetime password from auth server."""
     auth_server_url = get_nssh_config_item('auth_url')
 
     auth_form_info = {
@@ -163,9 +151,7 @@ def get_onepass(user_name, user_passwd, serial_num, status_code, reason):
 
 
 def get_serial_and_status(ssh_process):
-    """
-    Get serial_num and status_code from the SSH_PROCESS.
-    """
+    """Get serial_num and status_code from the SSH_PROCESS."""
     # Caution! before 属性中的字串可能一行也可能多行
     raw_info = ssh_process.before.strip().split('\r\n')
     info_chunk = raw_info[-1]
@@ -178,9 +164,7 @@ def get_serial_and_status(ssh_process):
 
 
 def are_validate_args_p(args):
-    """
-    Check ARGS validation.
-    """
+    """Check ARGS validation."""
     if len(args) != 1:
         return False
     else:
@@ -188,9 +172,7 @@ def are_validate_args_p(args):
 
 
 def nssh_login(account, host_ip, host_port):
-    """
-    Use ssh to login HOST_IP PORT with ACCOUNT.
-    """
+    """Use ssh to login HOST_IP PORT with ACCOUNT."""
     login_cmd = "ssh -p%d %s@%s " % (host_port, account, host_ip)
     ssh_process = pexpect.spawn(login_cmd)
 
@@ -293,9 +275,7 @@ def nssh_login(account, host_ip, host_port):
 
 
 def get_nssh_cli_parser(prog='nssh', version=__version__):
-    """
-    Return nssh cli parser and set nssh cli options.
-    """
+    """Return nssh cli parser and set nssh cli options."""
     cli_parser = OptionParser(prog=prog,
                               version=version,
                               usage="nssh [options] [user@]host_ip",
