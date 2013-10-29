@@ -43,6 +43,7 @@ $ python2.7 nssh.py host_ip -f /path/to/your_nssh.yaml
 __version__ = '0.1'
 
 
+from contextlib import contextmanager
 from optparse import OptionParser
 import os
 import sys
@@ -171,6 +172,15 @@ def are_validate_args_p(args):
         return True
 
 
+@contextmanager
+def timeout_handler():
+    """Handle pexpect timeout exception."""
+    try:
+        yield
+    except pexpect.TIMEOUT as timeout:
+        sys.exit("Ops, %s", timeout)
+
+
 def nssh_login(account, host_ip, host_port):
     """Use ssh to login HOST_IP PORT with ACCOUNT."""
     login_cmd = "ssh -p%d %s@%s " % (host_port, account, host_ip)
@@ -192,7 +202,7 @@ def nssh_login(account, host_ip, host_port):
     not_need_passwd = 2
     need_permission = 3
 
-    try:
+    with timeout_handler():
         expect_status = ssh_process.expect([
             firstime_login_server,
             passwd_needed_server,
@@ -270,8 +280,6 @@ def nssh_login(account, host_ip, host_port):
                 # 2.2.3 需要普通密码登陆的设备,又没有保存密码的设备,让用户输入
                 ssh_process.sendline()
                 ssh_process.interact()
-    except pexpect.TIMEOUT as timeout:
-        sys.exit("Ops, %s", timeout)
 
 
 def get_nssh_cli_parser(prog='nssh', version=__version__):
