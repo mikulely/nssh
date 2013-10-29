@@ -126,7 +126,7 @@ def need_onepass_p(info_chunk):
         return False
 
 
-def get_onepass(user_name, user_passwd, serial_num, status_code, reason):
+def fetch_onepass(user_name, user_passwd, serial_num, status_code, reason):
     """Get onetime password from auth server."""
     auth_server_url = get_nssh_config_item('auth_url')
 
@@ -230,11 +230,11 @@ def nssh_login(account, host_ip, host_port):
                     # 1.2.1 需要一次一密的设备,需要生成密码
                     serial_num, status_code = get_serial_and_status(ssh_process)
 
-                    onepass = get_onepass(get_nssh_config_item('name'),
-                                          get_nssh_config_item('passwd'),
-                                          serial_num,
-                                          status_code,
-                                          get_nssh_config_item('reason'))
+                    onepass = fetch_onepass(get_nssh_config_item('name'),
+                                            get_nssh_config_item('passwd'),
+                                            serial_num,
+                                            status_code,
+                                            get_nssh_config_item('reason'))
 
                     ssh_process.sendline(onepass)
                     ssh_process.expect([cmd_prompt])
@@ -260,11 +260,11 @@ def nssh_login(account, host_ip, host_port):
             # 2.2.1 需要一次一密的设备,需要生成密码
             serial_num, status_code = get_serial_and_status(ssh_process)
 
-            onepass = get_onepass(get_nssh_config_item('name'),
-                                  get_nssh_config_item('passwd'),
-                                  serial_num,
-                                  status_code,
-                                  get_nssh_config_item('reason'))
+            onepass = fetch_onepass(get_nssh_config_item('name'),
+                                    get_nssh_config_item('passwd'),
+                                    serial_num,
+                                    status_code,
+                                    get_nssh_config_item('reason'))
             ssh_process.sendline(onepass)
             # 在登陆后执行必要的操作,显示设备类型
             ssh_process.expect([cmd_prompt])
