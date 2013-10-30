@@ -178,7 +178,7 @@ def timeout_handler():
     try:
         yield
     except pexpect.TIMEOUT as timeout:
-        sys.exit("Ops, %s", timeout)
+        sys.exit("Ops, %s" % timeout)
 
 
 def nssh_login(account, host_ip, host_port):
