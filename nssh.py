@@ -98,7 +98,7 @@ def load_nssh_config(config_file):
         finally:
             yaml_file.close()
     else:
-        sys.exit('%s does not exist.\n Create it yourself.' % config_file)
+        sys.exit("%s does not exist.\n Create it yourself." % config_file)
 
 
 def get_nssh_config_item(config_item):
@@ -224,10 +224,15 @@ def nssh_login(account, host_ip, host_port):
             sshd_unabled_server
         ])
         if expect_status == need_permission:
-            sys.exit("Permission denied on %s. Can't login." % host_ip)
+            sys.exit("Permission denied on %s.\n"
+                     "You need to uncomment 'PasswordAuthentication yes'"
+                     "in /etc/ssh/ssh_config"
+                     % host_ip)
 
         if expect_status == sshd_unabled:
-            sys.exit("Sshd disabled on %s. Enable it before login again." % host_ip)
+            sys.exit("Sshd disabled on %s.\n"
+                     "Enable it before login again."
+                     % host_ip)
 
         # 1. 对于首次登陆的设备,需要先保存公钥
         if expect_status == firstime_login:
