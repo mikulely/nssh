@@ -207,21 +207,27 @@ def nssh_login(account, host_ip, host_port):
     passwd_needed_server = "Password:"
     permission_needed_server = "Permission denied"
     nopass_server = "[>#\$]"
+    sshd_unabled_server = "Connection refused"
 
     firstime_login = 0
     need_passwd = 1
     not_need_passwd = 2
     need_permission = 3
+    sshd_unabled = 4
 
     try:
         expect_status = ssh_process.expect([
             firstime_login_server,
             passwd_needed_server,
             nopass_server,
-            permission_needed_server
+            permission_needed_server,
+            sshd_unabled_server
         ])
         if expect_status == need_permission:
-            sys.exit("Permission denied on %s. Can't login" % host_ip)
+            sys.exit("Permission denied on %s. Can't login." % host_ip)
+
+        if expect_status == sshd_unabled:
+            sys.exit("Sshd disabled on %s. Enable it before login again." % host_ip)
 
         # 1. 对于首次登陆的设备,需要先保存公钥
         if expect_status == firstime_login:
