@@ -128,11 +128,11 @@ def get_termsize():
     return (rows, cols)
 
 
-def need_onepass_p(info_chunk):
+def need_onepass_p(info_raw):
     """
-    Check whether onepass is needed by search 'Serial' in INFO_CHUNK.
+    Check whether onepass is needed by search 'Serial' in INFO_RAW.
     """
-    if 'Serial' in info_chunk:
+    if 'Serial' in info_raw:
         return True
     else:
         return False
@@ -170,9 +170,8 @@ def get_serial_and_status(ssh_process):
     Get serial_num and status_code from the SSH_PROCESS.
     """
     # Caution! before 属性中的字串可能一行也可能多行
-    raw_info = ssh_process.before.strip().split('\r\n')
-    info_chunk = raw_info[-1]
-    serial_pair, status_pair = info_chunk.split()
+    info_raw = ssh_process.before.strip().split('\r\n')[-1]
+    serial_pair, status_pair = info_raw.split()
 
     serial_num = serial_pair.split(":")[1]
     status_code = status_pair.split(":")[1]
