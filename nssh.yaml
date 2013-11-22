@@ -23,3 +23,4 @@ host_list:
   - ip: 'xxxxxxxxxx'
     discription: 'xxx'
     passwd: 'xxxxxxxxxx'
+    user: 'xxxxxxxx'

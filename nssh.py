@@ -43,6 +43,7 @@ $ python2.7 nssh.py host_ip -f /path/to/your_nssh.yaml
 __version__ = '0.1'
 
 
+from contextlib import contextmanager
 from optparse import OptionParser
 import os
 import sys
@@ -56,10 +57,8 @@ import yaml
 g_nssh_config = dict()
 
 
-def is_a_known_host_p(host_ip):
-    """
-    Check whether HOST_IP's password is already stored in config file.
-    """
+def is_known_host_p(host_ip):
+    """Check whether HOST_IP's password is already stored in config file."""
     is_known_host_f = False
 
     host_list = get_nssh_config_item('host_list')
@@ -76,9 +75,7 @@ def is_a_known_host_p(host_ip):
 
 
 def get_known_host_passwd(host_ip):
-    """
-    Return HOST_IP's password from nssh config file.
-    """
+    """Return HOST_IP's password from nssh config file."""
     host_list = get_nssh_config_item('host_list')
     for host in host_list:
         if host_ip == host['ip']:
@@ -86,25 +83,18 @@ def get_known_host_passwd(host_ip):
 
 
 def load_nssh_config(config_file):
-    """
-    Load CONFIG_FILE to global variable G_NSSH_CONFIG, default is ~/.nssh.yaml.
-    """
+    """Load CONFIG_FILE to global variable G_NSSH_CONFIG."""
     global g_nssh_config
 
     if os.path.isfile(config_file):
-        yaml_file = open(config_file, 'r')
-        try:
+        with open(config_file, 'r') as yaml_file:
             g_nssh_config = yaml.safe_load(yaml_file)
-        finally:
-            yaml_file.close()
     else:
         sys.exit("%s does not exist.\n Create it yourself." % config_file)
 
 
 def get_nssh_config_item(config_item):
-    """
-    Get CONFIG_ITEM from global variable G_NSSH_CONFIG.
-    """
+    """Get CONFIG_ITEM from global variable G_NSSH_CONFIG."""
     if config_item in g_nssh_config:
         return g_nssh_config[config_item]
     else:
@@ -129,9 +119,7 @@ def get_termsize():
 
 
 def need_onepass_p(info_raw):
-    """
-    Check whether onepass is needed by search 'Serial' in INFO_RAW.
-    """
+    """Check whether onepass is needed by search 'Serial' in INFO_RAW."""
     if 'Serial' in info_raw:
         return True
     else:
@@ -139,9 +127,7 @@ def need_onepass_p(info_raw):
 
 
 def fetch_onepass(user_name, user_passwd, serial_num, status_code, reason):
-    """
-    Get onetime password from auth server.
-    """
+    """Get onetime password from auth server."""
     auth_server_url = get_nssh_config_item('auth_url')
 
     auth_form = {
@@ -166,9 +152,7 @@ def fetch_onepass(user_name, user_passwd, serial_num, status_code, reason):
 
 
 def get_serial_and_status(ssh_process):
-    """
-    Get serial_num and status_code from the SSH_PROCESS.
-    """
+    """Get serial_num and status_code from the SSH_PROCESS."""
     # Caution! before 属性中的字串可能一行也可能多行
     info_raw = ssh_process.before.strip().split('\r\n')[-1]
     serial_pair, status_pair = info_raw.split()
@@ -180,19 +164,24 @@ def get_serial_and_status(ssh_process):
 
 
 def are_validate_args_p(args):
-    """
-    Check ARGS validation.
-    """
+    """Check ARGS validation."""
     if len(args) != 1:
         return False
     else:
         return True
 
 
+@contextmanager
+def timeout_handler():
+    """Handle pexpect timeout exception."""
+    try:
+        yield
+    except pexpect.TIMEOUT as timeout:
+        sys.exit("Ops, %s" % str(timeout))
+
+
 def nssh_login(account, host_ip, host_port):
-    """
-    Use ssh to login HOST_IP PORT with ACCOUNT.
-    """
+    """Use ssh to login HOST_IP PORT with ACCOUNT."""
     login_cmd = "ssh -p%d %s@%s " % (host_port, account, host_ip)
     ssh_process = pexpect.spawn(login_cmd)
 
@@ -214,7 +203,7 @@ def nssh_login(account, host_ip, host_port):
     need_permission = 3
     sshd_unabled = 4
 
-    try:
+    with timeout_handler():
         expect_status = ssh_process.expect([
             firstime_login_server,
             passwd_needed_server,
@@ -252,17 +241,17 @@ def nssh_login(account, host_ip, host_port):
                     serial_num, status_code = get_serial_and_status(ssh_process)
 
                     onepass = fetch_onepass(get_nssh_config_item('name'),
-                                          get_nssh_config_item('passwd'),
-                                          serial_num,
-                                          status_code,
-                                          get_nssh_config_item('reason'))
+                                            get_nssh_config_item('passwd'),
+                                            serial_num,
+                                            status_code,
+                                            get_nssh_config_item('reason'))
 
                     ssh_process.sendline(onepass)
                     ssh_process.expect([cmd_prompt])
                     ssh_process.sendline(get_nssh_config_item('after_login_cmd'))
                     ssh_process.interact()
                 else:
-                    if is_a_known_host_p(host_ip):
+                    if is_known_host_p(host_ip):
                         # 1.2.2 需要普通密码登陆的设备,但是已经保存了密码的设备
                         stored_passwd = get_known_host_passwd(host_ip)
                         ssh_process.sendline(stored_passwd)
@@ -282,17 +271,17 @@ def nssh_login(account, host_ip, host_port):
             serial_num, status_code = get_serial_and_status(ssh_process)
 
             onepass = fetch_onepass(get_nssh_config_item('name'),
-                                  get_nssh_config_item('passwd'),
-                                  serial_num,
-                                  status_code,
-                                  get_nssh_config_item('reason'))
+                                    get_nssh_config_item('passwd'),
+                                    serial_num,
+                                    status_code,
+                                    get_nssh_config_item('reason'))
             ssh_process.sendline(onepass)
             # 在登陆后执行必要的操作,显示设备类型
             ssh_process.expect([cmd_prompt])
             ssh_process.sendline(get_nssh_config_item('after_login_cmd'))
             ssh_process.interact()
         else:
-            if is_a_known_host_p(host_ip):
+            if is_known_host_p(host_ip):
                 # 2.2.2 需要普通密码登陆的设备,但是已经保存了密码的设备
                 stored_passwd = get_known_host_passwd(host_ip)
                 ssh_process.sendline(stored_passwd)
@@ -301,14 +290,10 @@ def nssh_login(account, host_ip, host_port):
                 # 2.2.3 需要普通密码登陆的设备,又没有保存密码的设备,让用户输入
                 ssh_process.sendline()
                 ssh_process.interact()
-    except pexpect.TIMEOUT as timeout:
-        sys.exit("Ops, %s", timeout)
 
 
 def get_nssh_cli_parser(prog='nssh', version=__version__):
-    """
-    Return nssh cli parser and set nssh cli options.
-    """
+    """Return nssh cli parser and set nssh cli options."""
     cli_parser = OptionParser(prog=prog,
                               version=version,
                               usage="nssh [options] [user@]host_ip",
