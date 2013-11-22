@@ -218,13 +218,13 @@ def nssh_login(account, host_ip, host_port):
         ])
         if expect_status == need_permission:
             sys.exit("Permission denied on %s.\n"
-                     "You need to uncomment 'PasswordAuthentication yes'"
-                     "in /etc/ssh/ssh_config"
+                     "Maybe you need to uncomment 'PasswordAuthentication yes'"
+                     "in /etc/ssh/ssh_config.\n"
                      % host_ip)
 
         if expect_status == sshd_unabled:
             sys.exit("Sshd disabled on %s.\n"
-                     "Enable it before login again."
+                     "Enable it before login again.\n"
                      % host_ip)
 
         if expect_status == no_router:
