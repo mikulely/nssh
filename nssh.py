@@ -178,6 +178,8 @@ def timeout_handler():
         yield
     except pexpect.TIMEOUT as timeout:
         sys.exit("Ops, %s" % str(timeout))
+    except OSError:
+        sys.exit("Unproper input/output.")
 
 
 def nssh_login(account, host_ip, host_port):
@@ -196,12 +198,14 @@ def nssh_login(account, host_ip, host_port):
     permission_needed_server = "Permission denied"
     nopass_server = "[>#\$]"
     sshd_unabled_server = "Connection refused"
+    no_router_to_server = "No route to host"
 
     firstime_login = 0
     need_passwd = 1
     not_need_passwd = 2
     need_permission = 3
     sshd_unabled = 4
+    no_router = 5
 
     with timeout_handler():
         expect_status = ssh_process.expect([
@@ -209,7 +213,8 @@ def nssh_login(account, host_ip, host_port):
             passwd_needed_server,
             nopass_server,
             permission_needed_server,
-            sshd_unabled_server
+            sshd_unabled_server,
+            no_router_to_server
         ])
         if expect_status == need_permission:
             sys.exit("Permission denied on %s.\n"
@@ -221,6 +226,9 @@ def nssh_login(account, host_ip, host_port):
             sys.exit("Sshd disabled on %s.\n"
                      "Enable it before login again."
                      % host_ip)
+
+        if expect_status == no_router:
+            sys.exit("No router to %s.\n" % host_ip)
 
         # 1. 对于首次登陆的设备,需要先保存公钥
         if expect_status == firstime_login:
