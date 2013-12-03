@@ -220,6 +220,7 @@ def nssh_login(account, host_ip, host_port):
             sys.exit("Permission denied on %s.\n"
                      "Maybe you need to uncomment 'PasswordAuthentication yes'"
                      "in /etc/ssh/ssh_config.\n"
+                     "Or your password need to be updated.\n"
                      % host_ip)
 
         if expect_status == sshd_unabled:
