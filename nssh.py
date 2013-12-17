@@ -90,7 +90,9 @@ def load_nssh_config(config_file):
         with open(config_file, 'r') as yaml_file:
             g_nssh_config = yaml.safe_load(yaml_file)
     else:
-        sys.exit("%s does not exist.\n Create it yourself." % config_file)
+        sys.exit("%s does not exist.\n Create it yourself."
+                 "There's a template in the nssh git repo that you can refer."
+                 % config_file)
 
 
 def get_nssh_config_item(config_item):
