@@ -149,8 +149,8 @@ def fetch_onepass(user_name, user_passwd, serial_num, status_code, reason):
             if "<b>" in tag:
                 onepass_capitalized = tag[tag.find("<b>") + len("<b>"):]
                 # Caution! 密码认证时是区分大小写的.调试了很久有木有.T_T
-                print("Passwd: {}".format(onepass_capitalized.lower()))
                 print("===============================================")
+                print("Passwd: {}".format(onepass_capitalized.lower()))
                 return onepass_capitalized.lower()
     else:
         sys.exit("auth errors.")
@@ -303,6 +303,7 @@ def nssh_login(account, host_ip, host_port):
             ssh_process.sendline(onepass)
             # 在登陆后执行必要的操作,显示设备类型
             ssh_process.expect([cmd_prompt])
+            print("===============================================")
             ssh_process.sendline(get_nssh_config_item('after_login_cmd'))
             ssh_process.interact()
         else:
