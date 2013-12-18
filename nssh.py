@@ -46,6 +46,7 @@ __version__ = '0.1'
 from contextlib import contextmanager
 from optparse import OptionParser
 import os
+import re
 import sys
 
 
@@ -122,7 +123,7 @@ def get_termsize():
 
 def need_onepass_p(info_raw):
     """Check whether onepass is needed by search 'Serial' in INFO_RAW."""
-    if 'Serial' in info_raw:
+    if 'Serial:' in info_raw and 'Status:' in info_raw:
         return True
     else:
         return False
@@ -148,6 +149,8 @@ def fetch_onepass(user_name, user_passwd, serial_num, status_code, reason):
             if "<b>" in tag:
                 onepass_capitalized = tag[tag.find("<b>") + len("<b>"):]
                 # Caution! 密码认证时是区分大小写的.调试了很久有木有.T_T
+                print("Passwd: {}".format(onepass_capitalized.lower()))
+                print("===============================================")
                 return onepass_capitalized.lower()
     else:
         sys.exit("auth errors.")
@@ -156,11 +159,22 @@ def fetch_onepass(user_name, user_passwd, serial_num, status_code, reason):
 def get_serial_and_status(ssh_process):
     """Get serial_num and status_code from the SSH_PROCESS."""
     # Caution! before 属性中的字串可能一行也可能多行
-    info_raw = ssh_process.before.strip().split('\r\n')[-1]
-    serial_pair, status_pair = info_raw.split()
+    info_raw = ssh_process.before.strip()
 
-    serial_num = serial_pair.split(":")[1]
-    status_code = status_pair.split(":")[1]
+    serial_num = re.search(r'Serial:'
+                           r'(?P<serial_number>'
+                           r'[\d|\w]{4}-[\d|\w]{4}-[\d|\w]{4}-[\d|\w]{4})',
+                           info_raw).group('serial_number')
+
+    status_code = re.search(r'Status:'
+                            r'(?P<status_code>'
+                            r'[\d|\w]{6})',
+                            info_raw).group('status_code')
+
+    print("===============================================")
+    print("Serial: {}".format(serial_num))
+    print("===============================================")
+    print("Status: {}".format(status_code))
 
     return (serial_num, status_code)
 
@@ -174,14 +188,14 @@ def are_validate_args_p(args):
 
 
 @contextmanager
-def timeout_handler():
+def exception_handler():
     """Handle pexpect timeout exception."""
     try:
         yield
     except pexpect.TIMEOUT as timeout:
         sys.exit("Ops, %s" % str(timeout))
     except OSError:
-        sys.exit("Unproper input/output.")
+        sys.exit("Improper input/output.")
 
 
 def nssh_login(account, host_ip, host_port):
@@ -209,7 +223,7 @@ def nssh_login(account, host_ip, host_port):
     sshd_unabled = 4
     no_router = 5
 
-    with timeout_handler():
+    with exception_handler():
         expect_status = ssh_process.expect([
             firstime_login_server,
             passwd_needed_server,
@@ -226,7 +240,7 @@ def nssh_login(account, host_ip, host_port):
                      % host_ip)
 
         if expect_status == sshd_unabled:
-            sys.exit("Sshd disabled on %s.\n"
+            sys.exit("sshd disabled on %s.\n"
                      "Enable it before login again.\n"
                      % host_ip)
 
