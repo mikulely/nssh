@@ -302,7 +302,7 @@ def nssh_login(account, host_ip, host_port):
                                     status_code,
                                     get_nssh_config_item('reason'))
             ssh_process.sendline(onepass)
-            # 在登陆后执行必要的操作,显示设备类型
+            # 在登陆后执行必要的操作,例如显示设备类型之类的。
             ssh_process.expect([cmd_prompt])
             print("===============================================")
             ssh_process.sendline(get_nssh_config_item('after_login_cmd'))
