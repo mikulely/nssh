@@ -149,9 +149,10 @@ def fetch_onepass(user_name, user_passwd, serial_num, status_code, reason):
             if "<b>" in tag:
                 onepass_capitalized = tag[tag.find("<b>") + len("<b>"):]
                 # Caution! 密码认证时是区分大小写的.调试了很久有木有.T_T
+                onepass = onepass_capitalized.lower()
                 print("===============================================")
-                print("Passwd: {}".format(onepass_capitalized.lower()))
-                return onepass_capitalized.lower()
+                print("Passwd: {}".format(onepass))
+                return onepass
     else:
         sys.exit("auth errors.")
 
